@@ -1,5 +1,36 @@
 'use strict';
 
+var drawRect = function (ctx, x1, y1, width, height, color) {
+// задаем цвет заливки, если не задан то чёрный
+  ctx.fillStyle = color || '#000000';
+  ctx.fillRect(x1, y1, width, height);
+};
+
+var printText = function (ctx, text, x, y, font, color) {
+  ctx.font = font || '16px PT mono';
+  ctx.fillStyle = color || '#000000';
+  ctx.fillText(text, x, y);
+};
+
+var maxOfArray = function (values) {
+  // maximum result
+  var maxValue = values[0];
+  for (var i = 1; i < values.length; i++) {
+    if (maxValue < values[i]) {
+      maxValue = values[i];
+    }
+  }
+  return maxValue;
+};
+
+var drawStatColumn = function (ctx, playerName, playerResult, x, y, width, height) {
+  var competitorColumnColor = 'rgba(0,255,255,' + Math.random() + ')';
+  var playerColumnColor = 'rgba(255, 0, 0, 1)';
+
+  var columnColor = (playerName !== 'Вы') ? competitorColumnColor : playerColumnColor;
+  drawRect(ctx, x, y, width, height, columnColor);
+};
+
 window.renderStatistics = function (ctx, names, times) {
   var initialX = 100;
   var initialY = 10;
@@ -10,54 +41,29 @@ window.renderStatistics = function (ctx, names, times) {
   var histHeight = 150;
   var histColumnWidth = 40;
   var histInnerColumnSpace = 50;
-  var playerColumnColor = 'rgba(255, 0, 0, 1)';
-  var competitorColumnColor = 'rgba(0,255,255,';
 
   // main rectangle
-  ctx.beginPath();
-  ctx.moveTo(initialX, initialY);
-  ctx.lineTo(initialX + recWidth, initialY);
-  ctx.lineTo(initialX + recWidth, initialY + recHeight);
-  ctx.lineTo(initialX, initialY + recHeight);
-  ctx.closePath();
-  ctx.stroke();
-  ctx.fillStyle = '#ffffff';
-  ctx.fill();
+  drawRect(ctx, initialX, initialY, recWidth, recHeight, '#ffffff');
 
   // shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.7)';
-  ctx.fillRect(initialX + shadowShiftX, initialY + recHeight, recWidth, shadowShiftY);
-  ctx.fillRect(initialX + recWidth, initialY + shadowShiftY, shadowShiftX, recHeight - shadowShiftY);
+  drawRect(ctx, initialX + shadowShiftX, initialY + recHeight, recWidth, shadowShiftY, 'rgba(0,0,0,0.7)');
+  drawRect(ctx, initialX + recWidth, initialY + shadowShiftY, shadowShiftX, recHeight - shadowShiftY, 'rgba(0,0,0,0.7)');
 
   // text
-  ctx.font = '16px PT mono';
-  ctx.fillText('Ура, Вы победили!', 120, 40);
-  ctx.fillText('Список результатов:', 120, 60);
-
-  // maximum result
-  var maxResult = times[0];
-  for (var i = 1; i < times.length; i++) {
-    if (maxResult < times[i]) {
-      maxResult = times[i];
-    }
-  }
+  printText(ctx, 'Ура, Вы победили!', 120, 40);
+  printText(ctx, 'Список результатов:', 120, 60);
 
   // results histogram
   var xPosition = Math.floor(initialX + (recWidth - times.length * histColumnWidth - (times.length - 1) * histInnerColumnSpace) / 2);
   var columnHeight;
   var footerHeight = 30;
+  var maxResult = maxOfArray(times);
   for (var i = 0; i < names.length; i++) {
-    if (names[i] !== 'Вы') {
-      ctx.fillStyle = competitorColumnColor + Math.random() + ')';
-    } else {
-      ctx.fillStyle = playerColumnColor;
-    }
     columnHeight = Math.floor(times[i] / maxResult * histHeight);
-    ctx.fillRect(xPosition, initialY + recHeight - columnHeight - footerHeight, histColumnWidth, columnHeight);
+    drawStatColumn(ctx, names[i], times[i], xPosition, initialY + recHeight - columnHeight - footerHeight, histColumnWidth, columnHeight)
     // histograms annotations
-    ctx.fillStyle = '#000000';
-    ctx.fillText(names[i], xPosition, initialY + recHeight - 10);
-    ctx.fillText(Math.round(times[i]), xPosition, initialY + recHeight - columnHeight - footerHeight - 10);
+    printText(ctx, names[i], xPosition, initialY + recHeight - 10);
+    printText(ctx, Math.round(times[i]), xPosition, initialY + recHeight - columnHeight - footerHeight - 10);
     xPosition += histInnerColumnSpace + histColumnWidth;
   }
 };
