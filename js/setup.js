@@ -99,9 +99,6 @@ var changeEyesColor = function () {
 };
 
 var changeFireballColor = function () {
-  // var currentColor = window.getComputedStyle(setupFireballColor).backgroundColor;
-  // var newIndex = (FIREBALLCOLORS.indexOf(currentColor) + 1) % FIREBALLCOLORS.length;
-  // var newColor = FIREBALLCOLORS[newIndex];
   fireballColorIndex = (fireballColorIndex + 1) % FIREBALLCOLORS.length;
   var newColor = FIREBALLCOLORS[fireballColorIndex];
   setupFireballColor.style.backgroundColor = newColor;
